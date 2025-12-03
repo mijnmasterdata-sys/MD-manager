@@ -1,0 +1,5 @@
+{
+  "name": "LIMS Specification Builder",
+  "description": "A smart LIMS specification builder using Gemini for PDF extraction and intelligent catalogue matching.",
+  "requestFramePermissions": []
+}
