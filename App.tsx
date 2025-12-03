@@ -46,16 +46,16 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-slate-950 font-sans text-slate-200 flex">
       {/* Sidebar Navigation */}
-      <div className="fixed left-0 top-0 bottom-0 w-20 bg-slate-900 flex flex-col items-center py-6 z-50 shadow-xl">
+      <div className="w-20 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-6 fixed h-full z-50">
         <div className="mb-8">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/50">
+          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/50 ring-1 ring-white/10">
             <Beaker className="text-white w-6 h-6" />
           </div>
         </div>
 
-        <nav className="flex flex-col gap-6 w-full">
+        <nav className="flex flex-col gap-4 w-full px-2">
           <NavItem 
             icon={<FileText />} 
             active={currentView === 'PRODUCTS' || currentView === 'PRODUCT_FORM'} 
@@ -78,7 +78,7 @@ function App() {
       </div>
 
       {/* Main Content Area */}
-      <div className="ml-20 min-h-screen">
+      <div className="ml-20 flex-1 min-h-screen">
         {currentView === 'PRODUCTS' && (
           <ProductListView 
             onEdit={handleEditProduct} 
@@ -117,12 +117,14 @@ function App() {
 const NavItem = ({ icon, active, onClick, label }: { icon: React.ReactNode, active: boolean, onClick: () => void, label: string }) => (
   <button 
     onClick={onClick}
-    className={`w-full flex flex-col items-center justify-center gap-1 py-3 transition-all
-      ${active ? 'text-blue-400 border-r-2 border-blue-400 bg-white/5' : 'text-slate-400 hover:text-white hover:bg-white/5'}
+    className={`w-full flex flex-col items-center justify-center gap-1.5 py-3 rounded-lg transition-all duration-200 group
+      ${active 
+        ? 'bg-blue-600 text-white shadow-md shadow-blue-900/20' 
+        : 'text-slate-500 hover:text-slate-200 hover:bg-slate-800'}
     `}
   >
-    <div className={`w-6 h-6 ${active ? 'scale-110' : 'scale-100'}`}>{icon}</div>
-    <span className="text-[10px] font-medium">{label}</span>
+    <div className={`w-5 h-5 transition-transform duration-200 ${active ? 'scale-110' : 'group-hover:scale-110'}`}>{icon}</div>
+    <span className="text-[10px] font-medium tracking-wide">{label}</span>
   </button>
 );
 

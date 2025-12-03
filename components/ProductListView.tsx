@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Product } from '../types';
 import { STORAGE_KEYS } from '../constants';
 import { Button } from './Button';
-import { Plus, Edit, Trash2, FileText } from 'lucide-react';
+import { Plus, Edit, Trash2, FileText, Search } from 'lucide-react';
 
 interface Props {
   onEdit: (product: Product) => void;
@@ -11,6 +11,7 @@ interface Props {
 
 export const ProductListView: React.FC<Props> = ({ onEdit, onCreateNew }) => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [filter, setFilter] = useState('');
 
   useEffect(() => {
     loadProducts();
@@ -29,53 +30,80 @@ export const ProductListView: React.FC<Props> = ({ onEdit, onCreateNew }) => {
     }
   };
 
+  const filteredProducts = products.filter(p => 
+    p.name.toLowerCase().includes(filter.toLowerCase()) || 
+    p.code.toLowerCase().includes(filter.toLowerCase())
+  );
+
   return (
-    <div className="p-6 max-w-[1600px] mx-auto">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-8 max-w-[1600px] mx-auto">
+      <div className="flex justify-between items-end mb-8 border-b border-slate-800 pb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Product Specifications</h1>
-          <p className="text-slate-500 mt-1">Manage, edit, and export your LIMS product builds.</p>
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 tracking-tight mb-2">
+            Specifications
+          </h1>
+          <p className="text-slate-400">Manage, edit, and export your LIMS product builds.</p>
         </div>
-        <Button size="lg" onClick={onCreateNew} className="shadow-lg shadow-blue-500/20">
-          <Plus className="w-5 h-5 mr-2" />
-          Create New Spec
-        </Button>
+        <div className="flex gap-4">
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+            <input 
+              type="text"
+              placeholder="Search products..."
+              value={filter}
+              onChange={e => setFilter(e.target.value)}
+              className="pl-9 pr-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-64 transition-all placeholder-slate-600"
+            />
+          </div>
+          <Button size="md" onClick={onCreateNew}>
+            <Plus className="w-4 h-4 mr-2" />
+            New Specification
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map(product => (
-          <div key={product.id} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow group">
-            <div className="flex justify-between items-start mb-4">
-              <div className="p-3 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
-                <FileText className="w-6 h-6 text-blue-600" />
-              </div>
-              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => onEdit(product)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-slate-50 rounded-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {filteredProducts.map(product => (
+          <div key={product.id} className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5 transition-all group relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+               <button onClick={() => onEdit(product)} className="p-2 bg-slate-800 text-blue-400 hover:text-white hover:bg-blue-600 rounded-lg transition-colors shadow-lg">
                   <Edit className="w-4 h-4" />
                 </button>
-                <button onClick={() => handleDelete(product.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full">
+                <button onClick={() => handleDelete(product.id)} className="p-2 bg-slate-800 text-slate-400 hover:text-white hover:bg-red-600 rounded-lg transition-colors shadow-lg">
                   <Trash2 className="w-4 h-4" />
                 </button>
-              </div>
-            </div>
-            
-            <h3 className="text-lg font-bold text-slate-800 mb-1">{product.name || 'Unnamed Product'}</h3>
-            <div className="flex gap-2 text-sm text-slate-500 font-mono mb-4">
-              <span className="bg-slate-100 px-2 py-0.5 rounded">{product.code || 'NO-CODE'}</span>
-              <span>•</span>
-              <span>{product.specs.length} Tests</span>
             </div>
 
-            <div className="text-xs text-slate-400 border-t pt-4">
-              Last Modified: {new Date(product.lastModified).toLocaleDateString()}
+            <div className="flex items-start gap-4 mb-4">
+              <div className="p-3 bg-slate-800 rounded-xl group-hover:bg-blue-500/10 group-hover:text-blue-400 transition-colors border border-slate-700/50 group-hover:border-blue-500/20">
+                <FileText className="w-6 h-6 text-slate-400 group-hover:text-blue-400 transition-colors" />
+              </div>
+              <div className="flex-1 min-w-0 pr-16">
+                 <h3 className="text-lg font-bold text-white truncate mb-1">{product.name || 'Unnamed Product'}</h3>
+                 <div className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium bg-slate-950 text-slate-300 border border-slate-800">
+                   {product.code || 'NO-CODE'}
+                 </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-slate-500 pt-4 border-t border-slate-800/50 mt-2">
+              <span className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                {product.specs.length} Tests
+              </span>
+              <span>Updated {new Date(product.lastModified).toLocaleDateString()}</span>
             </div>
           </div>
         ))}
         
         {products.length === 0 && (
-          <div className="col-span-full py-20 text-center bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-            <p className="text-slate-500 text-lg">No products found.</p>
-            <Button variant="outline" className="mt-4" onClick={onCreateNew}>Get Started</Button>
+          <div className="col-span-full py-24 text-center bg-slate-900/30 rounded-xl border border-dashed border-slate-800 flex flex-col items-center">
+            <div className="bg-slate-800/50 p-4 rounded-full mb-4">
+              <FileText className="w-8 h-8 text-slate-600" />
+            </div>
+            <h3 className="text-lg font-medium text-white mb-2">No specifications found</h3>
+            <p className="text-slate-500 mb-6 max-w-sm mx-auto">Get started by creating a new specification manually or import one from a PDF document.</p>
+            <Button variant="outline" onClick={onCreateNew}>Create First Spec</Button>
           </div>
         )}
       </div>

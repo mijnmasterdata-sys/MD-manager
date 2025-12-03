@@ -47,65 +47,68 @@ export const CatalogueEntryForm: React.FC<Props> = ({ isOpen, initialData, onClo
     onSave(formData);
   };
 
+  const inputClass = "w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-white placeholder-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all";
+  const labelClass = "block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2";
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg">
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-bold text-slate-800">
-            {initialData ? 'Edit Catalogue Entry' : 'New Catalogue Entry'}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+        <div className="flex justify-between items-center p-6 border-b border-slate-800">
+          <h2 className="text-xl font-bold text-white">
+            {initialData ? 'Edit Entry' : 'New Entry'}
           </h2>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-700">
+          <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors">
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="p-8 grid grid-cols-2 gap-6">
           <div className="col-span-1">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Test Code</label>
-            <input required name="testCode" value={formData.testCode} onChange={handleChange} className="w-full border rounded p-2" />
+            <label className={labelClass}>Test Code</label>
+            <input required name="testCode" value={formData.testCode} onChange={handleChange} className={inputClass} placeholder="e.g. T-100" />
           </div>
           <div className="col-span-1">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-            <input name="category" value={formData.category} onChange={handleChange} className="w-full border rounded p-2" />
+            <label className={labelClass}>Category</label>
+            <input name="category" value={formData.category} onChange={handleChange} className={inputClass} placeholder="General" />
           </div>
 
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Analysis Name</label>
-            <input required name="analysisName" value={formData.analysisName} onChange={handleChange} className="w-full border rounded p-2" />
+            <label className={labelClass}>Analysis Name</label>
+            <input required name="analysisName" value={formData.analysisName} onChange={handleChange} className={inputClass} placeholder="e.g. Appearance" />
           </div>
 
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Component Name</label>
-            <input required name="componentName" value={formData.componentName} onChange={handleChange} className="w-full border rounded p-2" />
+            <label className={labelClass}>Component Name</label>
+            <input required name="componentName" value={formData.componentName} onChange={handleChange} className={inputClass} placeholder="e.g. Description" />
           </div>
 
           <div className="col-span-1">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Units</label>
-            <input name="units" value={formData.units} onChange={handleChange} className="w-full border rounded p-2" />
+            <label className={labelClass}>Units</label>
+            <input name="units" value={formData.units} onChange={handleChange} className={inputClass} placeholder="e.g. % w/w" />
           </div>
           <div className="col-span-1">
-             <label className="block text-sm font-medium text-slate-700 mb-1">Result Type</label>
-             <select name="resultType" value={formData.resultType} onChange={handleChange} className="w-full border rounded p-2">
+             <label className={labelClass}>Result Type</label>
+             <select name="resultType" value={formData.resultType} onChange={handleChange} className={inputClass}>
                <option value="N">Numeric</option>
                <option value="T">Text</option>
              </select>
           </div>
 
           <div className="col-span-1">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Decimal Places</label>
-            <input type="number" name="places" value={formData.places} onChange={handleChange} className="w-full border rounded p-2" />
+            <label className={labelClass}>Decimals</label>
+            <input type="number" name="places" value={formData.places} onChange={handleChange} className={inputClass} />
           </div>
           <div className="col-span-1">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Default Grade</label>
-            <input name="defaultGrade" value={formData.defaultGrade} onChange={handleChange} className="w-full border rounded p-2" />
+            <label className={labelClass}>Default Grade</label>
+            <input name="defaultGrade" value={formData.defaultGrade} onChange={handleChange} className={inputClass} />
           </div>
           
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1">Spec Rule (Default)</label>
-            <input name="specRule" value={formData.specRule} onChange={handleChange} className="w-full border rounded p-2" placeholder="e.g. MIN_MAX" />
+            <label className={labelClass}>Spec Rule</label>
+            <input name="specRule" value={formData.specRule} onChange={handleChange} className={inputClass} placeholder="e.g. MIN_MAX" />
           </div>
 
-          <div className="col-span-2 flex justify-end gap-3 mt-4">
+          <div className="col-span-2 flex justify-end gap-3 mt-4 pt-6 border-t border-slate-800">
             <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
             <Button type="submit">Save Entry</Button>
           </div>

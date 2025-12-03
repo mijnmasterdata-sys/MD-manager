@@ -31,7 +31,7 @@ export const ExportToolModal: React.FC<Props> = ({ isOpen, product, onClose }) =
     // 2. PRODUCT_GRADE Tab
     const gradeData = [{
       PRODUCT_CODE: product.code,
-      GRADE: 'RELEASE', // Default
+      GRADE: 'RELEASE', 
       DESCRIPTION: 'Release Grade',
       SAMPLING_PLAN: 'STD'
     }];
@@ -49,7 +49,6 @@ export const ExportToolModal: React.FC<Props> = ({ isOpen, product, onClose }) =
     XLSX.utils.book_append_sheet(wb, wsStage, "PRODUCT_GRADE_STAGE");
 
     // 4. PRODUCT_SPEC Tab
-    // Must sort by order first
     const sortedSpecs = [...product.specs].sort((a, b) => a.order - b.order);
     const specData = sortedSpecs.map(spec => ({
       PRODUCT_CODE: product.code,
@@ -68,26 +67,25 @@ export const ExportToolModal: React.FC<Props> = ({ isOpen, product, onClose }) =
     const wsSpec = XLSX.utils.json_to_sheet(specData);
     XLSX.utils.book_append_sheet(wb, wsSpec, "PRODUCT_SPEC");
 
-    // Download
     XLSX.writeFile(wb, `${product.code}_Spec_Load.xlsx`);
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm">
-        <div className="p-6 text-center">
-          <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FileSpreadsheet className="w-8 h-8 text-green-600" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+        <div className="p-8 text-center">
+          <div className="bg-green-500/10 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 ring-1 ring-green-500/20">
+            <FileSpreadsheet className="w-10 h-10 text-green-500" />
           </div>
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Export to Excel</h2>
-          <p className="text-slate-500 mb-6 text-sm">
-            This will generate a LabWare-compatible XLSX file with 4 tabs for Product, Grade, Stage, and Spec definitions.
+          <h2 className="text-xl font-bold text-white mb-2">Export to Excel</h2>
+          <p className="text-slate-400 mb-8 text-sm leading-relaxed">
+            Generate a LabWare-compatible XLSX file with Product, Grade, Stage, and Spec definitions.
           </p>
           
           <div className="flex gap-3 justify-center">
             <Button variant="outline" onClick={onClose}>Cancel</Button>
-            <Button onClick={handleExport} className="bg-green-600 hover:bg-green-700">Download .xlsx</Button>
+            <Button onClick={handleExport} className="bg-green-600 hover:bg-green-500 text-white border-none shadow-lg shadow-green-900/20">Download .xlsx</Button>
           </div>
         </div>
       </div>

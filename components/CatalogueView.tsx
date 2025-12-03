@@ -4,13 +4,13 @@ import { CatalogueEntry } from '../types';
 import { getCatalogue, saveCatalogue, addAuditLog } from '../services/catalogueService';
 import { CatalogueEntryForm } from './CatalogueEntryForm';
 import { Button } from './Button';
-import { Plus, Upload, Download, Trash2, Edit } from 'lucide-react';
-import { DEFAULT_CATALOGUE_HEADER } from '../constants';
+import { Plus, Upload, Download, Trash2, Edit, FileSpreadsheet } from 'lucide-react';
 
 export const CatalogueView: React.FC = () => {
   const [catalogue, setCatalogue] = useState<CatalogueEntry[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<CatalogueEntry | undefined>(undefined);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     setCatalogue(getCatalogue());
@@ -74,7 +74,6 @@ export const CatalogueView: React.FC = () => {
       const ws = wb.Sheets[wsname];
       const data = XLSX.utils.sheet_to_json(ws) as any[];
 
-      // Map incoming data to strict schema
       const imported: CatalogueEntry[] = data.map(row => ({
         id: crypto.randomUUID(),
         testCode: row.testCode || 'UNKNOWN',
@@ -96,30 +95,43 @@ export const CatalogueView: React.FC = () => {
     reader.readAsBinaryString(file);
   };
 
+  const filteredCatalogue = catalogue.filter(c => 
+    c.analysisName.toLowerCase().includes(search.toLowerCase()) || 
+    c.testCode.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="p-6 max-w-[1600px] mx-auto">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-8 max-w-[1600px] mx-auto">
+      <div className="flex justify-between items-end mb-8 border-b border-slate-800 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">LIMS Catalogue Master</h1>
-          <p className="text-slate-500">Manage standard analysis definitions and codes</p>
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 tracking-tight mb-2">
+            Catalogue Master
+          </h1>
+          <p className="text-slate-400">Manage standard analysis definitions and codes</p>
         </div>
         <div className="flex gap-3">
-          <label className="cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50">
+           <input 
+            type="text" 
+            placeholder="Search catalogue..." 
+            className="bg-slate-900 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder-slate-600 transition-all"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          <label className="cursor-pointer inline-flex items-center justify-center rounded-lg text-sm font-medium h-10 px-4 py-2 border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800 transition-colors">
             <Upload className="w-4 h-4 mr-2" />
-            Import CSV
+            Import
             <input type="file" accept=".csv,.xlsx" className="hidden" onChange={handleImport} />
           </label>
-          <div className="flex rounded-md shadow-sm" role="group">
+          <div className="flex rounded-lg shadow-sm" role="group">
             <button
               onClick={handleExportCSV}
-              className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-l-lg hover:bg-slate-50 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
+              className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-900 border border-slate-700 rounded-l-lg hover:bg-slate-800 hover:text-white focus:z-10 focus:ring-2 focus:ring-blue-600"
             >
-              <Download className="w-4 h-4 inline mr-2" />
               CSV
             </button>
             <button
               onClick={handleExportXLSX}
-              className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-l-0 border-slate-300 rounded-r-lg hover:bg-slate-50 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
+              className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-900 border border-l-0 border-slate-700 rounded-r-lg hover:bg-slate-800 hover:text-white focus:z-10 focus:ring-2 focus:ring-blue-600"
             >
               XLSX
             </button>
@@ -131,46 +143,51 @@ export const CatalogueView: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white border rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-xl overflow-hidden ring-1 ring-white/5">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-slate-50 text-slate-500 uppercase font-semibold">
+            <thead className="bg-slate-950 text-slate-400 uppercase text-xs font-semibold tracking-wider border-b border-slate-800">
               <tr>
-                <th className="px-6 py-3">Test Code</th>
-                <th className="px-6 py-3">Analysis</th>
-                <th className="px-6 py-3">Component</th>
-                <th className="px-6 py-3">Units</th>
-                <th className="px-6 py-3">Type</th>
-                <th className="px-6 py-3">Places</th>
-                <th className="px-6 py-3 text-right">Actions</th>
+                <th className="px-6 py-4">Test Code</th>
+                <th className="px-6 py-4">Analysis</th>
+                <th className="px-6 py-4">Component</th>
+                <th className="px-6 py-4">Units</th>
+                <th className="px-6 py-4">Type</th>
+                <th className="px-6 py-4">Places</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
-              {catalogue.map(entry => (
-                <tr key={entry.id} className="hover:bg-slate-50/50">
-                  <td className="px-6 py-3 font-mono text-xs font-medium text-slate-600">{entry.testCode}</td>
-                  <td className="px-6 py-3 font-medium text-slate-800">{entry.analysisName}</td>
-                  <td className="px-6 py-3 text-slate-600">{entry.componentName}</td>
-                  <td className="px-6 py-3 text-slate-600">{entry.units}</td>
+            <tbody className="divide-y divide-slate-800 text-slate-300">
+              {filteredCatalogue.map(entry => (
+                <tr key={entry.id} className="hover:bg-slate-800/50 transition-colors group">
+                  <td className="px-6 py-3 font-mono text-xs text-blue-400">{entry.testCode}</td>
+                  <td className="px-6 py-3 font-medium text-white">{entry.analysisName}</td>
+                  <td className="px-6 py-3 text-slate-400">{entry.componentName}</td>
+                  <td className="px-6 py-3 text-slate-400">{entry.units}</td>
                   <td className="px-6 py-3">
-                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${entry.resultType === 'N' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                      {entry.resultType === 'N' ? 'NUM' : 'TXT'}
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wide border ${entry.resultType === 'N' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border-purple-500/20'}`}>
+                      {entry.resultType === 'N' ? 'NUMERIC' : 'TEXT'}
                     </span>
                   </td>
-                  <td className="px-6 py-3 text-slate-600">{entry.places}</td>
-                  <td className="px-6 py-3 text-right flex justify-end gap-2">
-                    <button onClick={() => { setEditingEntry(entry); setIsFormOpen(true); }} className="text-blue-600 hover:text-blue-800 p-1">
+                  <td className="px-6 py-3 text-slate-400">{entry.places}</td>
+                  <td className="px-6 py-3 text-right flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => { setEditingEntry(entry); setIsFormOpen(true); }} className="text-slate-400 hover:text-blue-400 p-1 transition-colors">
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleDelete(entry.id)} className="text-red-500 hover:text-red-700 p-1">
+                    <button onClick={() => handleDelete(entry.id)} className="text-slate-400 hover:text-red-400 p-1 transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>
               ))}
-              {catalogue.length === 0 && (
+              {filteredCatalogue.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-400">No catalogue entries found. Import or add one.</td>
+                  <td colSpan={7} className="text-center py-16 text-slate-500">
+                    <div className="flex flex-col items-center">
+                      <FileSpreadsheet className="w-10 h-10 mb-3 opacity-20" />
+                      <p>No catalogue entries found.</p>
+                    </div>
+                  </td>
                 </tr>
               )}
             </tbody>

@@ -1,11 +1,15 @@
 import { GoogleGenAI } from "@google/genai";
 import { ExtractedData } from "../types";
 
+// Declare process to avoid TypeScript errors when accessing env in client-side code
+declare const process: any;
+
 const getClient = () => {
-  // Access API key from environment variable
+  // Access API key from environment variable process.env.API_KEY as per Google GenAI guidelines
+  // The API key must be obtained exclusively from this variable.
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    console.error("API_KEY is not set in environment");
+    console.error("API_KEY is not set in environment variables");
   }
   return new GoogleGenAI({ apiKey: apiKey || '' });
 };
@@ -44,7 +48,7 @@ export const parsePDFText = async (pdfText: string): Promise<ExtractedData> => {
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: prompt,
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: {
         responseMimeType: 'application/json'
       }

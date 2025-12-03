@@ -3,5 +3,34 @@
 @tailwind utilities;
 
 body {
-  background-color: #f8fafc;
+  @apply bg-slate-950 text-slate-200 antialiased;
+}
+
+/* Modern Selection Color */
+::selection {
+  @apply bg-blue-500/30 text-blue-100;
+}
+
+/* Modern Dark Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-950;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-800 rounded-full border-2 border-slate-950;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-700;
+}
+
+/* Input AutoFill Fix for Dark Mode */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px #0f172a inset !important;
+    -webkit-text-fill-color: white !important;
 }
