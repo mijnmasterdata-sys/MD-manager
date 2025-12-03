@@ -2,10 +2,10 @@ import { GoogleGenAI } from "@google/genai";
 import { ExtractedData } from "../types";
 
 const getClient = () => {
-  // Access API key from Vite environment variable
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  // Access API key from environment variable
+  const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    console.error("VITE_GEMINI_API_KEY is not set in environment");
+    console.error("API_KEY is not set in environment");
   }
   return new GoogleGenAI({ apiKey: apiKey || '' });
 };
@@ -44,7 +44,7 @@ export const parsePDFText = async (pdfText: string): Promise<ExtractedData> => {
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      contents: prompt,
       config: {
         responseMimeType: 'application/json'
       }
