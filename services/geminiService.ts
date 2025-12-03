@@ -1,19 +1,13 @@
 import { GoogleGenAI } from "@google/genai";
 import { ExtractedData } from "../types";
 
-// Declare process to avoid TypeScript errors in environments where it might not be explicitly typed
-// This satisfies the compiler when accessing process.env.API_KEY
-declare var process: {
-  env: {
-    API_KEY: string;
-  };
-};
-
 const getClient = () => {
-  // The API key must be obtained exclusively from the environment variable process.env.API_KEY
-  // as per @google/genai Coding Guidelines.
-  // We assume this variable is pre-configured, valid, and accessible in the execution context.
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // Access API key from Vite environment variable
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  if (!apiKey) {
+    console.error("VITE_GEMINI_API_KEY is not set in environment");
+  }
+  return new GoogleGenAI({ apiKey: apiKey || '' });
 };
 
 export const parsePDFText = async (pdfText: string): Promise<ExtractedData> => {
@@ -50,7 +44,7 @@ export const parsePDFText = async (pdfText: string): Promise<ExtractedData> => {
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: prompt,
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
       config: {
         responseMimeType: 'application/json'
       }

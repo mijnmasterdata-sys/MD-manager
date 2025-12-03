@@ -116,12 +116,17 @@ export const findBestMatches = (extractedName: string, catalogue: CatalogueEntry
       score = 1.0;
       reason = 'Exact Match';
     } 
-    // Contains
+    // StartsWith Match
+    else if (normalizedEntry.startsWith(normalizedQuery) || normalizedQuery.startsWith(normalizedEntry)) {
+      score = 0.9;
+      reason = 'Starts With';
+    }
+    // Contains Match
     else if (normalizedEntry.includes(normalizedQuery) || normalizedQuery.includes(normalizedEntry)) {
       score = 0.8;
-      reason = 'Substring Match';
+      reason = 'Contains';
     } 
-    // Levenshtein
+    // Levenshtein & Ratio Scoring
     else {
       const dist = levenshteinDistance(normalizedQuery, normalizedEntry);
       const maxLen = Math.max(normalizedQuery.length, normalizedEntry.length);

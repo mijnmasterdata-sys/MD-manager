@@ -93,6 +93,9 @@ export const ProductForm: React.FC<Props> = ({ initialData, extractedData, onSav
       min: extracted.min?.toString() || '',
       max: extracted.max?.toString() || '',
       textSpec: extracted.text || '',
+      overrideMin: '',
+      overrideMax: '',
+      overrideText: '',
       units: extracted.unit || catalogue.units,
       category: catalogue.category,
       grade: catalogue.defaultGrade,
@@ -116,6 +119,9 @@ export const ProductForm: React.FC<Props> = ({ initialData, extractedData, onSav
       min: extracted.min?.toString() || '',
       max: extracted.max?.toString() || '',
       textSpec: extracted.text || '',
+      overrideMin: '',
+      overrideMax: '',
+      overrideText: '',
       units: extracted.unit || '',
       category: '',
       grade: '',
@@ -217,20 +223,27 @@ export const ProductForm: React.FC<Props> = ({ initialData, extractedData, onSav
 
       {/* Grid */}
       <div className="flex-1 overflow-auto bg-slate-50 p-4">
-        <div className="bg-white border rounded shadow-sm overflow-hidden min-w-[1200px]">
-          <table className="w-full text-sm text-left border-collapse">
+        <div className="bg-white border rounded shadow-sm overflow-hidden min-w-[1600px]">
+          <table className="w-full text-xs text-left border-collapse">
             <thead className="bg-slate-100 text-slate-600 font-bold sticky top-0 z-10 shadow-sm">
               <tr>
-                <th className="p-2 border w-16">Order</th>
+                <th className="p-2 border w-12">Ord</th>
                 <th className="p-2 border w-24">Test Code</th>
-                <th className="p-2 border w-48">Analysis</th>
-                <th className="p-2 border w-48">Component</th>
-                <th className="p-2 border w-24">Rule</th>
-                <th className="p-2 border w-24">Min</th>
-                <th className="p-2 border w-24">Max</th>
-                <th className="p-2 border w-64">Text Spec</th>
-                <th className="p-2 border w-20">Units</th>
-                <th className="p-2 border w-24">Grade</th>
+                <th className="p-2 border w-32">Analysis</th>
+                <th className="p-2 border w-32">Component</th>
+                <th className="p-2 border w-20">Rule</th>
+                
+                <th className="p-2 border w-20 bg-blue-50">Min</th>
+                <th className="p-2 border w-20 bg-blue-50">Max</th>
+                <th className="p-2 border w-32 bg-blue-50">Text</th>
+                
+                <th className="p-2 border w-20 bg-yellow-50">Ovr Min</th>
+                <th className="p-2 border w-20 bg-yellow-50">Ovr Max</th>
+                <th className="p-2 border w-32 bg-yellow-50">Ovr Text</th>
+                
+                <th className="p-2 border w-16">Units</th>
+                <th className="p-2 border w-16">Grade</th>
+                <th className="p-2 border w-24">Lit Ref</th>
               </tr>
             </thead>
             <tbody>
@@ -244,12 +257,12 @@ export const ProductForm: React.FC<Props> = ({ initialData, extractedData, onSav
                       className="w-full p-2 bg-transparent outline-none text-center"
                     />
                   </td>
-                  <td className="p-2 border font-mono text-xs">{spec.testCode}</td>
+                  <td className="p-2 border font-mono text-[10px]">{spec.testCode}</td>
                   <td className="p-2 border truncate" title={spec.analysis}>
-                    {spec.isUnresolved && <AlertTriangle className="w-4 h-4 text-red-500 inline mr-1"/>}
+                    {spec.isUnresolved && <AlertTriangle className="w-3 h-3 text-red-500 inline mr-1"/>}
                     {spec.analysis}
                   </td>
-                  <td className="p-2 border truncate">{spec.component}</td>
+                  <td className="p-2 border truncate" title={spec.component}>{spec.component}</td>
                   <td className="p-0 border">
                     <input 
                       value={spec.rule}
@@ -257,32 +270,68 @@ export const ProductForm: React.FC<Props> = ({ initialData, extractedData, onSav
                       className="w-full p-2 bg-transparent outline-none"
                     />
                   </td>
-                  <td className="p-0 border">
+                  
+                  {/* Extracted/Default Values */}
+                  <td className="p-0 border bg-blue-50/20">
                     <input 
                       value={spec.min}
                       onChange={(e) => handleSpecChange(spec.id, 'min', e.target.value)}
                       className="w-full p-2 bg-transparent outline-none"
                     />
                   </td>
-                  <td className="p-0 border">
+                  <td className="p-0 border bg-blue-50/20">
                      <input 
                       value={spec.max}
                       onChange={(e) => handleSpecChange(spec.id, 'max', e.target.value)}
                       className="w-full p-2 bg-transparent outline-none"
                     />
                   </td>
-                  <td className="p-0 border">
+                  <td className="p-0 border bg-blue-50/20">
                      <input 
                       value={spec.textSpec}
                       onChange={(e) => handleSpecChange(spec.id, 'textSpec', e.target.value)}
                       className="w-full p-2 bg-transparent outline-none"
                     />
                   </td>
+
+                  {/* Override Values */}
+                  <td className="p-0 border bg-yellow-50/20">
+                    <input 
+                      value={spec.overrideMin}
+                      onChange={(e) => handleSpecChange(spec.id, 'overrideMin', e.target.value)}
+                      className="w-full p-2 bg-transparent outline-none"
+                      placeholder="-"
+                    />
+                  </td>
+                  <td className="p-0 border bg-yellow-50/20">
+                     <input 
+                      value={spec.overrideMax}
+                      onChange={(e) => handleSpecChange(spec.id, 'overrideMax', e.target.value)}
+                      className="w-full p-2 bg-transparent outline-none"
+                      placeholder="-"
+                    />
+                  </td>
+                  <td className="p-0 border bg-yellow-50/20">
+                     <input 
+                      value={spec.overrideText}
+                      onChange={(e) => handleSpecChange(spec.id, 'overrideText', e.target.value)}
+                      className="w-full p-2 bg-transparent outline-none"
+                      placeholder="-"
+                    />
+                  </td>
+
                   <td className="p-2 border">{spec.units}</td>
                   <td className="p-0 border">
                      <input 
                       value={spec.grade}
                       onChange={(e) => handleSpecChange(spec.id, 'grade', e.target.value)}
+                      className="w-full p-2 bg-transparent outline-none"
+                    />
+                  </td>
+                  <td className="p-0 border">
+                     <input 
+                      value={spec.litRef}
+                      onChange={(e) => handleSpecChange(spec.id, 'litRef', e.target.value)}
                       className="w-full p-2 bg-transparent outline-none"
                     />
                   </td>

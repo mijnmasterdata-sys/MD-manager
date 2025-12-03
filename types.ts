@@ -45,6 +45,9 @@ export interface ProductSpecRow {
   min: string; // Stored as string to allow empty
   max: string; // Stored as string to allow empty
   textSpec: string;
+  overrideMin: string;
+  overrideMax: string;
+  overrideText: string;
   units: string;
   category: string;
   grade: string;

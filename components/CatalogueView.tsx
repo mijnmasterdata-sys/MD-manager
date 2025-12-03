@@ -37,13 +37,30 @@ export const CatalogueView: React.FC = () => {
     }
   };
 
-  const handleExport = () => {
+  const handleExportXLSX = () => {
     const ws = XLSX.utils.json_to_sheet(catalogue);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Catalogue");
     XLSX.writeFile(wb, "lims_catalogue.xlsx");
-    addAuditLog("EXPORT", "Exported catalogue to CSV/XLSX");
+    addAuditLog("EXPORT", "Exported catalogue to XLSX");
   };
+
+  const handleExportCSV = () => {
+    const ws = XLSX.utils.json_to_sheet(catalogue);
+    const csv = XLSX.utils.sheet_to_csv(ws);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "lims_catalogue.csv");
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    addAuditLog("EXPORT", "Exported catalogue to CSV");
+  }
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -92,10 +109,21 @@ export const CatalogueView: React.FC = () => {
             Import CSV
             <input type="file" accept=".csv,.xlsx" className="hidden" onChange={handleImport} />
           </label>
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="w-4 h-4 mr-2" />
-            Export CSV
-          </Button>
+          <div className="flex rounded-md shadow-sm" role="group">
+            <button
+              onClick={handleExportCSV}
+              className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-l-lg hover:bg-slate-50 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
+            >
+              <Download className="w-4 h-4 inline mr-2" />
+              CSV
+            </button>
+            <button
+              onClick={handleExportXLSX}
+              className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-l-0 border-slate-300 rounded-r-lg hover:bg-slate-50 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700"
+            >
+              XLSX
+            </button>
+          </div>
           <Button onClick={() => { setEditingEntry(undefined); setIsFormOpen(true); }}>
             <Plus className="w-4 h-4 mr-2" />
             Add Entry
